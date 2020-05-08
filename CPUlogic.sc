@@ -8,7 +8,7 @@ var CLEAR = 9
 // Columns are 3 4 5
 // Diagonals left-right are 6 7
 
-var DANGER = -1
+var MOVE = -1
 
 def printMatrix(array: Array[Array[Int]]) : Unit = {
     for( i <- 0 to 2) {
@@ -57,37 +57,51 @@ def addDiagonal(array: Array[Array[Int]], start_i: Int) : Int = {
 }
 
 
-def checkDanger(array: Array[Array[Int]], cpu_mark: Int, user_mark: Int) : Int = {
+// Mode 0 Checks for Possible win, Mode 1 checks for a possible move leading to win
+
+def checkMove(array: Array[Array[Int]], cpu_mark: Int, user_mark: Int, mode: Int) : Int = {
     /*
        [_][_][_]
        [_][_][_]
        [_][_][_]
     */
+    var sumCheck = CLEAR + (user_mark * 2)
+    var checkRand = 0
+    var randMove =  0
+
+    if (mode == 1){
+      println("CHEESE")
+      sumCheck = (CLEAR * 2) + cpu_mark
+      randMove =  Random.between(0, 2)
+    }
+
 
     /* Same row
        [_][_][_]
        [x][x][_]
        [_][_][_]
     */
-    if (array(0).sum == CLEAR + (user_mark * 2)) {
-      DANGER = 0
+    if (array(0).sum == sumCheck) {
+      MOVE = 0
     }
 
-    if (array(1).sum == CLEAR + (user_mark * 2)) {
-      DANGER = 1
+    if (array(1).sum == sumCheck) {
+      MOVE = 1
     }
 
-    if (array(2).sum == CLEAR + (user_mark * 2)) {
-      DANGER = 2
+    if (array(2).sum == sumCheck) {
+      MOVE = 2
     }
 
-
-    if (DANGER == 0 || DANGER == 1 || DANGER == 2){
-      var i = DANGER
+    if (MOVE == 0 || MOVE == 1 || MOVE == 2){
+      var i = MOVE
       for (j <- 0 to 2){
-        if (array(i)(j) == CLEAR){
+        if (array(i)(j) == CLEAR && checkRand == randMove){
           array(i)(j) = cpu_mark
           return 1
+        }
+        if (array(i)(j) == CLEAR){
+          checkRand += 1
         }
       }
     }
@@ -99,60 +113,65 @@ def checkDanger(array: Array[Array[Int]], cpu_mark: Int, user_mark: Int) : Int =
     */
 
 
-    if ((array(0)(0) + array(1)(0) + array(2)(0)) == CLEAR + (user_mark * 2)){
-      DANGER = 3
+    if ((array(0)(0) + array(1)(0) + array(2)(0)) == sumCheck){
+      MOVE = 3
     }
 
-    if ((array(0)(1) + array(1)(1) + array(2)(1)) == CLEAR + (user_mark * 2)){
-      DANGER = 4
+    if ((array(0)(1) + array(1)(1) + array(2)(1)) == sumCheck){
+      MOVE = 4
     }
 
-    if ((array(0)(2) + array(1)(2) + array(2)(2)) == CLEAR + (user_mark * 2)){
-      DANGER = 5
+    if ((array(0)(2) + array(1)(2) + array(2)(2)) == sumCheck){
+      MOVE = 5
     }
 
-    if (DANGER == 3 || DANGER == 4 || DANGER == 5){
-      var j = DANGER - 3
+    println(MOVE)
+    if (MOVE == 3 || MOVE == 4 || MOVE == 5){
+      var j = MOVE - 3
       for (i <- 0 to 2){
-        if (array(i)(j) == CLEAR){
+        if (array(i)(j) == CLEAR && checkRand == randMove){
           array(i)(j) = cpu_mark
           return 1
         }
-
+        if (array(i)(j) == CLEAR){
+          checkRand += 1
+        }
       }
     }
-
     /* Diagonal
        [x][_][_]
        [_][x][_]
        [_][_][_]
     */
 
-    if (addDiagonal(array, 0) == CLEAR + (user_mark * 2)) {
-      DANGER = 6
+    if (addDiagonal(array, 0) == sumCheck) {
+      MOVE = 6
     }
 
-    if (addDiagonal(array, 2) == CLEAR + (user_mark * 2)) {
-      DANGER = 7
+    if (addDiagonal(array, 2) == sumCheck) {
+      MOVE = 7
     }
 
 
-    if (DANGER == 6 || DANGER == 7){
+    if (MOVE == 6 || MOVE == 7){
       var i = 0
       var move_i = 1
-      if (DANGER == 7){
+      if (MOVE == 7){
         i = 2
         move_i = -1
       }
 
       for (j <- 0 to 2){
-        if (array(i)(j) == CLEAR){
+        if (array(i)(j) == CLEAR && checkRand == randMove){
           array(i)(j) = cpu_mark
           return 1
         }
+
+        if (array(i)(j) == CLEAR){
+          checkRand += 1
+        }
         i += move_i
       }
-
     }
 
 
@@ -163,6 +182,8 @@ def checkDanger(array: Array[Array[Int]], cpu_mark: Int, user_mark: Int) : Int =
 def moveCPU (array: Array[Array[Int]], cpu_mark: Int, user_mark: Int) : Unit = {
     var limitLow = 0
     var limitHigh = 3
+    var moved = 0
+
 
     if (array(0).sum == CLEAR * 3 && array(1).sum == CLEAR * 3 && array(2).sum == CLEAR * 3){
       var randRow =  Random.between(limitLow, limitHigh)
@@ -171,12 +192,30 @@ def moveCPU (array: Array[Array[Int]], cpu_mark: Int, user_mark: Int) : Unit = {
       array(randRow)(randColumn) = cpu_mark
     }
     else {
-      var dang = checkDanger(array, cpu_mark, user_mark)
-      if (dang == 1){
+
+      // Mode 0 to check for win of user
+      moved = checkMove(array, cpu_mark, user_mark, 0)
+      if (moved == 1){
+        MOVE = -1
         return
       }
 
-      println("No Danger")
+      // Mode 0 to check for win of cpu (both marks cpu)
+      moved = checkMove(array, cpu_mark, cpu_mark, 0)
+      if (moved == 1){
+        MOVE = -1
+        return
+      }
+
+
+      // Mode 1 to check for good move of cpu (both marks cpu)
+      moved = checkMove(array, cpu_mark, cpu_mark, 1)
+      if (moved == 1){
+        MOVE = -1
+        return
+      }
+
+      println("Did not move")
     }
 
 
@@ -194,7 +233,9 @@ printMatrix(matrix)
 var cpu_mark = 0
 var user_mark = 1
 
-matrix(2)(0) = 1
-matrix(0)(2) = 1
+matrix(0)(0) = user_mark
+matrix(2)(0) = cpu_mark
+matrix(2)(1) = user_mark
+printMatrix(matrix)
 moveCPU(matrix, cpu_mark, user_mark)
 printMatrix(matrix)
