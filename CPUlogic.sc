@@ -53,7 +53,6 @@ object cpuLogic extends App {
       j += 1
     }
 
-
     return sum
   }
 
@@ -277,20 +276,90 @@ object cpuLogic extends App {
 
   }
 
+  def checkWin(array: Array[Array[Int]], cpu_mark: Int, user_mark: Int) : Int = {
+    // 0 No Win ---- 1 if User wins ---- 2 if CPU / User 2 Wins
+
+    var sumUser = user_mark * 3
+    var sumCPU = cpu_mark * 3
+
+    // CHECK FOR ROWS ----------------------------------
+
+    if (array(0).sum == sumUser) {
+      return 1
+    } else if (array(0).sum == sumCPU) {
+      return 2
+    }
+
+    if (array(1).sum == sumUser) {
+      return 1
+    } else if (array(1).sum == sumCPU) {
+      return 2
+    }
+
+    if (array(2).sum == sumUser) {
+      return 1
+    } else if (array(2).sum == sumCPU) {
+      return 2
+    }
+
+    // CHECK FOR COLUMNS ----------------------------------
+
+    if ((array(0)(0) + array(1)(0) + array(2)(0)) == sumUser){
+      return 1
+    } else if ((array(0)(0) + array(1)(0) + array(2)(0)) == sumCPU) {
+      return 2
+    }
+
+    if ((array(0)(1) + array(1)(1) + array(2)(1)) == sumUser){
+      return 1
+    } else if ((array(0)(1) + array(1)(1) + array(2)(1)) == sumCPU) {
+      return 2
+    }
+
+    if ((array(0)(2) + array(1)(2) + array(2)(2)) == sumUser){
+      return 1
+    } else if ((array(0)(2) + array(1)(2) + array(2)(2)) == sumCPU) {
+      return 2
+    }
+
+    // CHECK FOR DIAGONALS ----------------------------------
+
+    if (addDiagonal(array, 0) == sumUser) {
+      return 1
+    }
+    else if (addDiagonal(array, 0) == sumCPU){
+      return 2
+    }
+
+    if (addDiagonal(array, 2) == sumUser) {
+      return 1
+    } else if (addDiagonal(array, 2) == sumCPU) {
+      return 2
+    }
+
+    return 0
+  }
+
   val matrix = Array.ofDim[Int](3,3)
   // Mark = 0 is o - 1 is x
   var cpu_mark = 0
   var user_mark = 1
-
+  var win = 0
   // 0 Easy 1 Medium 2 Hard
   var difficulty = 0
 
   initializeMatrix(matrix, CLEAR)
   printMatrix(matrix)
 
-  matrix(0)(2) = cpu_mark
 
-  moveCPU(matrix, cpu_mark, user_mark, difficulty)
-  moveCPU(matrix, cpu_mark, user_mark, difficulty)
+
+  // moveCPU(matrix, cpu_mark, user_mark, difficulty)
+
+  matrix(0)(2) = cpu_mark
+  matrix(1)(1) = cpu_mark
+  matrix(2)(0) = cpu_mark
+
+  win = checkWin(matrix, cpu_mark, user_mark)
+  println(win)
   printMatrix(matrix)
 }
