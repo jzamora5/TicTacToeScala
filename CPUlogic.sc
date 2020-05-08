@@ -205,48 +205,80 @@ object cpuLogic extends App {
 
   }
 
+  def logicMove(array: Array[Array[Int]], cpu_mark: Int, user_mark: Int) : Int = {
 
-  def moveCPU (array: Array[Array[Int]], cpu_mark: Int, user_mark: Int) : Unit = {
-    var limitLow = 0
-    var limitHigh = 3
     var moved = 0
     var rand_moved = 0
 
+    // Mode 0 to check for win of user
+    moved = checkMove(array, cpu_mark, user_mark, 0)
+    if (moved == 1){
+      MOVE = -1
+      return 1
+    }
+
+    // Mode 0 to check for win of cpu (both marks cpu)
+    moved = checkMove(array, cpu_mark, cpu_mark, 0)
+    if (moved == 1){
+      MOVE = -1
+      return 1
+    }
+
+    // Mode 1 to check for good move of cpu (both marks cpu)
+    moved = checkMove(array, cpu_mark, cpu_mark, 1)
+    if (moved == 1) {
+      MOVE = -1
+      return 1
+    }
+    rand_moved = randomMove(array, cpu_mark)
+    if (rand_moved == 1) {
+      MOVE = -1
+      return 1
+    }
+
+    MOVE = -1
+    return 0
+
+  }
+
+  def moveCPU (array: Array[Array[Int]], cpu_mark: Int, user_mark: Int, diffculty: Int) : Unit = {
+
+    var mediumRand = 0
+    var moved = 0
+    var rand_moved = 0
+
+    // EMPTY BOARD -------------------------------------------
     if (array(0).sum == CLEAR * 3 && array(1).sum == CLEAR * 3 && array(2).sum == CLEAR * 3){
-      var randRow =  Random.between(limitLow, limitHigh)
-      var randColumn = Random.between(limitLow, limitHigh)
-
-      array(randRow)(randColumn) = cpu_mark
+      moved = randomMove(array, cpu_mark)
+      if (moved == 0){
+        println("Error: Did not position CPU")
+      }
+      MOVE = -1
+      return
     }
-    else {
 
-      // Mode 0 to check for win of user
-      moved = checkMove(array, cpu_mark, user_mark, 0)
-      if (moved == 1){
-        MOVE = -1
-        return
+    if (difficulty == 0){
+      // EASY ALL RANDOM
+      moved = randomMove(array, cpu_mark)
+    } else if (difficulty == 1) {
+      // MEDIUM SEMI-RANDOM
+      mediumRand = Random.between(0, 2)
+      if (mediumRand == 0){
+        moved = randomMove(array, cpu_mark)
+      } else {
+        moved = logicMove(array, cpu_mark, user_mark)
       }
-
-      // Mode 0 to check for win of cpu (both marks cpu)
-      moved = checkMove(array, cpu_mark, cpu_mark, 0)
-      if (moved == 1){
-        MOVE = -1
-        return
-      }
-
-      // Mode 1 to check for good move of cpu (both marks cpu)
-      moved = checkMove(array, cpu_mark, cpu_mark, 1)
-      if (moved == 1) {
-        MOVE = -1
-        return
-      }
-      rand_moved = randomMove(array, cpu_mark)
-      if (rand_moved == 1) {
-        MOVE = -1
-        return
-      }
-      println("Did not position CPU")
+    } else {
+      // HARD ALL LOGIC
+      moved = logicMove(array, cpu_mark, user_mark)
     }
+
+    MOVE = -1
+
+    if (moved == 0){
+      println("Error: Did not position CPU")
+    }
+
 
   }
 
@@ -255,21 +287,14 @@ object cpuLogic extends App {
   var cpu_mark = 0
   var user_mark = 1
 
+  // 0 Easy 1 Medium 2 Hard
+  var difficulty = 0
+
   initializeMatrix(matrix, CLEAR)
   printMatrix(matrix)
 
-  matrix(1)(1) = cpu_mark
-  printMatrix(matrix)
-  matrix(0)(0) = user_mark
-  printMatrix(matrix)
-  matrix(1)(0) = cpu_mark
-  printMatrix(matrix)
+  matrix(0)(2) = cpu_mark
 
-  matrix(1)(2) = user_mark
-  printMatrix(matrix)
-  matrix(2)(1) = cpu_mark
-  matrix(0)(1) = user_mark
-  printMatrix(matrix)
-  moveCPU(matrix, cpu_mark, user_mark)
+  moveCPU(matrix, cpu_mark, user_mark, difficulty)
   printMatrix(matrix)
 }
