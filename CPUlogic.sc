@@ -213,30 +213,26 @@ object cpuLogic extends App {
     // Mode 0 to check for win of user
     moved = checkMove(array, cpu_mark, user_mark, 0)
     if (moved == 1){
-      MOVE = -1
       return 1
     }
 
     // Mode 0 to check for win of cpu (both marks cpu)
     moved = checkMove(array, cpu_mark, cpu_mark, 0)
     if (moved == 1){
-      MOVE = -1
       return 1
     }
 
     // Mode 1 to check for good move of cpu (both marks cpu)
     moved = checkMove(array, cpu_mark, cpu_mark, 1)
     if (moved == 1) {
-      MOVE = -1
-      return 1
-    }
-    rand_moved = randomMove(array, cpu_mark)
-    if (rand_moved == 1) {
-      MOVE = -1
       return 1
     }
 
-    MOVE = -1
+    rand_moved = randomMove(array, cpu_mark)
+    if (rand_moved == 1) {
+      return 1
+    }
+
     return 0
 
   }
@@ -279,7 +275,6 @@ object cpuLogic extends App {
       println("Error: Did not position CPU")
     }
 
-
   }
 
   val matrix = Array.ofDim[Int](3,3)
@@ -295,6 +290,7 @@ object cpuLogic extends App {
 
   matrix(0)(2) = cpu_mark
 
+  moveCPU(matrix, cpu_mark, user_mark, difficulty)
   moveCPU(matrix, cpu_mark, user_mark, difficulty)
   printMatrix(matrix)
 }
