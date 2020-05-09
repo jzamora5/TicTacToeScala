@@ -212,6 +212,12 @@ class logicGame {
     var moved = 0
     var rand_moved = 0
 
+    // Mode 0 to check for win of CPU
+    moved = checkMove(array, cpu_mark, cpu_mark, 0)
+    if (moved == 1) {
+      return 1
+    }
+
     // Mode 0 to check for win of user
     moved = checkMove(array, cpu_mark, user_mark, 0)
     if (moved == 1) {
