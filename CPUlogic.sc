@@ -277,7 +277,7 @@ object cpuLogic extends App {
   }
 
   def checkWin(array: Array[Array[Int]], cpu_mark: Int, user_mark: Int) : Int = {
-    // 0 No Win ---- 1 if User wins ---- 2 if CPU / User 2 Wins
+    // 0 No Win ---- 1 if User wins ---- 2 if CPU / User 2 Wins -- 3 Draw
 
     var sumUser = user_mark * 3
     var sumCPU = cpu_mark * 3
@@ -337,6 +337,13 @@ object cpuLogic extends App {
       return 2
     }
 
+
+    // CHECK DRAW
+
+    if (array(0).sum < CLEAR && array(1).sum < CLEAR && array(2).sum < CLEAR) {
+      return 3
+    }
+
     return 0
   }
 
@@ -355,9 +362,15 @@ object cpuLogic extends App {
 
   // moveCPU(matrix, cpu_mark, user_mark, difficulty)
 
-  matrix(0)(2) = cpu_mark
-  matrix(1)(1) = cpu_mark
+  matrix(0)(0) = user_mark
+  matrix(0)(1) = cpu_mark
+  matrix(0)(2) = user_mark
+  matrix(1)(0) = user_mark
+  matrix(1)(1) = user_mark
+  matrix(1)(2) = cpu_mark
   matrix(2)(0) = cpu_mark
+  matrix(2)(1) = cpu_mark
+  matrix(2)(2) = user_mark
 
   win = checkWin(matrix, cpu_mark, user_mark)
   println(win)
